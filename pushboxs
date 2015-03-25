@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+//简易推箱子
+//还需完善功能：1.箱子与终点的随机性 2.地图的随机性 3.永远无法达到终点的判断
+void maps(void);
+void responKeypress(void);
+
+#define ROWS 10
+#define COLS 10
+
+char map1[ROWS][COLS]={'*','*','*','*','*','*','*','*','*','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*',' ',' ',' ',' ',' ',' ',' ',' ','*',
+                      '*','*','*','*','*','*','*','*','*','*'
+};
+char map2[ROWS][COLS];
+
+typedef struct{
+    unsigned int x;
+    unsigned int y;
+} Point;
+Point me={2,3};
+Point box1={2,6};
+Point box2={3,4};
+Point end1={7,8};
+Point end2={3,6};
+
+
+int main()
+{
+    maps();
+    responKeypress();
+    return 0;
+}
+
+void maps(void){
+    //地图
+    system("CLS");
+    strcpy(map2,map1);
+    int i,j;
+    for(i=0;i<ROWS;i++){
+        for(j=0;j<COLS;j++){
+            if(i==me.x&&j==me.y)
+                map2[i][j]='I';
+            else if(i==box1.x&&j==box1.y)
+                map2[i][j]='B';
+            else if(i==box2.x&&j==box2.y)
+                map2[i][j]='B';
+            else if(i==end1.x&&j==end1.y)
+                map2[i][j]='E';
+            else if(i==end2.x&&j==end2.y)
+                map2[i][j]='E';
+            printf("%c",map2[i][j]);
+        }
+        printf("\n");
+    };
+
+}
+
+void responKeypress(void){
+    //反应与移动
+    while(1){
+        if(map2[end1.x][end1.y]=='B'&&map2[end2.x][end2.y]=='B'){
+            printf("\nYOU WIN!");break;
+        }
+        char ch=_getch();
+        if(ch=='q')
+            break;
+        switch(ch){
+            case 'w':if(map2[me.x-1][me.y]=='*')break;//遇到墙壁不动
+                     else if(map2[me.x-1][me.y]=='B'&&map2[me.x-2][me.y]!='*'){
+                             me.x-=1;//遇到箱子且没有墙壁
+                             if(me.x==box1.x&&me.y==box1.y){
+                             box1.x-=1;
+                             }else box2.x-=1;//判断是哪个箱子
+                             break;
+                     }else if(map2[me.x-1][me.y]=='B'&&map2[me.x-2][me.y]=='*')break;//有箱子和墙壁
+                     else if(map2[me.x-1][me.y]=='B'&&map2[me.x-2][me.y]=='B')break;//两个箱子
+                     else {me.x-=1;break;};//me移动
+            case 'a':if(map2[me.x][me.y-1]=='*')break;
+                     else if(map2[me.x][me.y-1]=='B'&&map2[me.x][me.y-2]!='*'){
+                             me.y-=1;
+                             if(me.y==box1.y&&me.x==box1.x){
+                             box1.y-=1;
+                             }else box2.y-=1;
+                             break;
+                     }else if(map2[me.x][me.y-1]=='B'&&map2[me.x][me.y-2]=='*')break;
+                     else if(map2[me.x][me.y-1]=='B'&&map2[me.x][me.y-2]=='B')break;
+                     else {me.y-=1;break;};
+            case 's':if(map2[me.x+1][me.y]=='*')break;
+                     else if(map2[me.x+1][me.y]=='B'&&map2[me.x+2][me.y]!='*'){
+                             me.x+=1;
+                             if(me.x==box1.x&&me.y==box1.y){
+                             box1.x+=1;
+                             }else box2.x+=1;
+                             break;
+                     }else if(map2[me.x+1][me.y]=='B'&&map2[me.x+2][me.y]=='*')break;
+                     else if(map2[me.x+1][me.y]=='B'&&map2[me.x+2][me.y]=='B')break;
+                     else {me.x+=1;break;};
+            case 'd':if(map2[me.x][me.y+1]=='*')break;
+                     else if(map2[me.x][me.y+1]=='B'&&map2[me.x][me.y+2]!='*'){
+                             me.y+=1;
+                             if(me.y==box1.y&&me.x==box1.x){
+                             box1.y+=1;
+                             }else box2.y+=1;
+                             break;
+                     }else if(map2[me.x][me.y+1]=='B'&&map2[me.x][me.y+2]=='*')break;
+                     else if(map2[me.x][me.y+1]=='B'&&map2[me.x][me.y+2]=='B')break;
+                     else {me.y+=1;break;};
+        }
+        maps();
+        if(ch=='w'||ch=='a'||ch=='s'||ch=='d')
+            printf("%c",ch);
+        else
+            printf("Invalid!");
+    }
+}
